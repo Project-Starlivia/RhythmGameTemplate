@@ -1,0 +1,2 @@
+# RhythmGameTemplate
+書典19で頒布するIwakenLab Techbook vol.7のへのへのんの章のサンプルプロジェクトのリポジトリ
