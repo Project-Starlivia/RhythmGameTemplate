@@ -40,24 +40,24 @@ namespace GameCore
         }
 
         /// <summary>
-        /// 秒単位の経過時間をTickに変換します。
+        /// 秒単位の時間をTickに変換します。
         /// </summary>
-        /// <param name="elapsedTimeSeconds">経過時間（秒単位）</param>
+        /// <param name="timeSeconds">時間（秒単位）</param>
         /// <param name="bpm">楽曲のテンポ（BPM）</param>
-        /// <returns>経過時間に対応するTick値</returns>
-        public static double ElapsedTimeToTick(double elapsedTimeSeconds, int bpm)
+        /// <returns>時間に対応するTick値</returns>
+        public static double TimeToTick(double timeSeconds, int bpm)
         {
             var ticksPerSecond = TicksPerSecond(bpm);
-            return elapsedTimeSeconds * ticksPerSecond;
+            return timeSeconds * ticksPerSecond;
         }
 
         /// <summary>
-        /// 指定されたティック数を経過時間（秒）に変換します。
+        /// 指定されたティック数を時間（秒）に変換します。
         /// </summary>
         /// <param name="bpm">テンポを表すビート毎分（BPM）。</param>
         /// <param name="tick">変換対象となるティック数。</param>
-        /// <returns>指定されたティック数に相当する経過時間（秒）。</returns>
-        public static double TickToElapsedTime(int bpm, double tick)
+        /// <returns>指定されたティック数に相当する時間（秒）。</returns>
+        public static double TickToTime(int bpm, double tick)
         {
             var ticksPerSecond = TicksPerSecond(bpm);
             return tick / ticksPerSecond;

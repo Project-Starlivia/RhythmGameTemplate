@@ -22,7 +22,7 @@ namespace BmsCore
 
             // Beatオブジェクトを格納する配列
             var beatsList = new List<Beat>();
-
+            
             // 全小節を順番に処理
             for (var measureIndex = 0; measureIndex <= maxMeasure; measureIndex++)
             {
@@ -33,20 +33,20 @@ namespace BmsCore
                 // 小節内の各チャンネル(レーン)を処理
                 foreach (var (channelType, values) in measureChannels)
                 {
-                    // チャンネル内の各位置のデータを処理
+                    // チャンネル内のパラメータごとにデータを処理
                     for (var i = 0; i < values.Length; i++)
                     {
-                        // 値が0の場合はノートが存在しないためスキップ
+                        // 値が0の場合はノーツが存在しないためスキップ
                         if (values[i] == 0) continue;
 
-                        // 現在位置のBMS Tick値を計算
-                        var bmsTick = TickCalculator.CalculateCurrentTick(measureIndex, i, values.Length);
+                        // 現在位置のTick値を計算
+                        var tick = TickCalculator.CalculateCurrentTick(measureIndex, i, values.Length);
 
-                        // BMSデータからビート情報を生成
+                        // データからビート情報を生成
                         var noteType = (NoteType)(int)values[i];
                         var laneType =  (NoteLane)channelType;
-                        var beat = new Beat(bmsTick, noteType,laneType);
-                        
+                        var beat = new Beat(tick, noteType,laneType);
+					
                         // 作成したBeatを追加
                         beatsList.Add(beat);
                     }
