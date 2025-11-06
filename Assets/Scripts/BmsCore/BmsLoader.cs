@@ -1,17 +1,32 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace LibBms
+namespace BmsCore
 {
+    /// <summary>
+    /// BMSファイル内で使用されるチャンネルの種類を表す列挙型
+    /// </summary>
+    public enum BmsChannelType
+    {
+        // Note lanes
+        LaneOne = 11,           // xxx11: Lane One
+        LaneTwo = 12,           // xxx12: Lane Two
+        LaneThree = 13,         // xxx13: Lane Three
+        LaneFour = 14,          // xxx14: Lane Four
+        LaneFive = 15,          // xxx15: Lane Five
+        LaneSix = 18,           // xxx18: Lane Six
+    }
+    
     /// <summary>
     /// BMSデータを解析し、対応するBMSスコアオブジェクトを生成するクラス
     /// </summary>
     public static class BmsLoader
     {
         private static readonly Regex TitlePattern = new Regex(@"^#TITLE\s+(.+)$", RegexOptions.Compiled);
+        private static readonly Regex BpmPattern = new Regex(@"^#BPM([0-9A-Z]{2})\s+(\d+)$", RegexOptions.Compiled);
         private static readonly Regex OffsetPattern = new Regex(@"^#OFFSET\s+([\d.]+)$", RegexOptions.Compiled);
         
-        private static readonly Regex CodePattern = new Regex(@"^#(\d{3})(\d{2}):(.+)$", RegexOptions.Compiled);
+        private static readonly Regex MainDataPattern = new Regex(@"^#(\d{3})(\d{2}):(.+)$", RegexOptions.Compiled);
         private static readonly Regex SplitTwoPattern = new Regex(@"(.{2})", RegexOptions.Compiled);
 
 
@@ -23,15 +38,11 @@ namespace LibBms
         public static BmsScore Load(List<string> bmsStrings)
         {
             // === 基本情報の初期化 ===
-            string title = null;                    // 楽曲タイトル
-            double offsetSecs = 0;                 // オフセット秒数
-            
-            // === 拡張BMS定義の格納用 ===
-            var bpmDefinitions = new Dictionary<string, int>();      // #BPMxx: hex_id -> bpm_value
-            var stopDefinitions = new Dictionary<string, double>();  // #STOPxx: hex_id -> stop_duration
-            
+            string title = null;                   // 楽曲タイトル
+            int bpm = 120;                         // BPM
+            double offset = 0;                     // オフセット秒数
+
             // === チャンネルデータの統合格納構造 ===
-            // measure -> channel -> double[] (時系列順の値配列)
             var channelData = new Dictionary<int, Dictionary<BmsChannelType, double[]>>();
 
             // === BMS行の解析処理 ===
@@ -48,22 +59,31 @@ namespace LibBms
                     continue;
                 }
                 
+                // --- BPM情報の解析 (#BPM) ---
+                var bpmMatch = BpmPattern.Match(trimmedLine);
+                if (bpmMatch.Success)
+                {
+                    if (int.TryParse(bpmMatch.Groups[1].Value, out var parsedBpm))
+                        bpm = parsedBpm;
+                    continue;
+                }
+
                 // --- オフセット情報の解析 (#OFFSET) ---
                 var offsetMatch = OffsetPattern.Match(trimmedLine);
                 if (offsetMatch.Success)
                 {
-                    if (double.TryParse(offsetMatch.Groups[1].Value, out var parsedOffsetSecs))
-                        offsetSecs = parsedOffsetSecs;
+                    if (double.TryParse(offsetMatch.Groups[1].Value, out var parsedOffset))
+                        offset = parsedOffset;
                     continue;
                 }
                 
-                // --- チャンネルデータの解析 (#MMMll:data) ---
-                var codMatch = CodePattern.Match(trimmedLine);
-                if (!(codMatch.Success &&
-                    int.TryParse(codMatch.Groups[1].Value, out var measure) && 
-                    int.TryParse(codMatch.Groups[2].Value, out var channel))) continue;
+                // --- チャンネルデータの解析 (#MMMcc:data) ---
+                var mainDataMatch = MainDataPattern.Match(trimmedLine);
+                if (!(mainDataMatch.Success &&
+                    int.TryParse(mainDataMatch.Groups[1].Value, out var measure) && 
+                    int.TryParse(mainDataMatch.Groups[2].Value, out var channel))) continue;
 
-                var data = codMatch.Groups[3].Value;
+                var data = mainDataMatch.Groups[3].Value;
                 var channelType = (BmsChannelType)channel;
                 
                 // 小節用辞書の初期化
@@ -79,7 +99,7 @@ namespace LibBms
                 channelData[measure][channelType] = splitValues;
             }
             
-            return new BmsScore(title, offsetSecs, channelData);
+            return new BmsScore(title, bpm, offset, channelData);
         }
         
         /// <summary>

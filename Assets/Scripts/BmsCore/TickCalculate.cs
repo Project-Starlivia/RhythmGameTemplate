@@ -1,4 +1,4 @@
-namespace LibBms
+namespace BmsCore
 {
     /// <summary>
     /// Tick関連の計算を行うためのユーティリティを提供します。
@@ -19,7 +19,7 @@ namespace LibBms
         /// <param name="beatCountInMeasure">1小節内の総拍数。</param>
         /// <param name="measureLength">小節の長さを表す係数。</param>
         /// <returns>計算されたBMSのティック値。</returns>
-        public static int CalculateBmsTick(int measureIndex, int beatIndex, int beatCountInMeasure, int measureLength)
+        public static int CalculateBmsTick(int measureIndex, int beatIndex, int beatCountInMeasure, int measureLength = 1)
         {
             return (int)(measureIndex * TicksPerMeasure + (beatIndex * TicksPerMeasure / beatCountInMeasure) / measureLength);
         }
@@ -48,7 +48,7 @@ namespace LibBms
         /// <param name="bpm">楽曲のテンポ（BPM）</param>
         /// <param name="measureLength">小節の長さ（標準小節からの割合）</param>
         /// <returns>経過時間に対応するBMSのTick値</returns>
-        public static double ElapsedTimeToTick(double elapsedTimeSeconds, int bpm, float measureLength)
+        public static double ElapsedTimeToTick(double elapsedTimeSeconds, int bpm, float measureLength = 1)
         {
             var bmsTicksPerSecond = TicksPerSecond(bpm, measureLength);
             return elapsedTimeSeconds * bmsTicksPerSecond;
