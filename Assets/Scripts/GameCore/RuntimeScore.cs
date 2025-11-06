@@ -6,20 +6,20 @@ namespace GameCore
     /// 楽曲のスコアデータを表現するクラス
     /// 曲名、初期BPM、全体のオフセット、拍データを管理する
     /// </summary>
-    public sealed class PlayScore
+    public sealed class RuntimeScore
     {
         public readonly string Title;
         public readonly int Bpm;
         public readonly double BeatsOffset;
-        private readonly Beat[] beats;
-        public Beat[] Beats => beats;
+        private readonly Beat[] _beats;
+        public Beat[] Beats => _beats;
 
-        public PlayScore(string title, int bpm, double beatsOffset, Beat[] beats)
+        public RuntimeScore(string title, int bpm, double beatsOffset, Beat[] beats)
         {
             Title = title;
             Bpm = bpm;
             BeatsOffset = beatsOffset;
-            this.beats = beats;
+            _beats = beats;
         }
 
         public override string ToString()
@@ -27,10 +27,10 @@ namespace GameCore
             var sb = new StringBuilder();
             sb.AppendLine($"Title: {Title}");
             sb.AppendLine($"BeatsOffset: {BeatsOffset}");
-            sb.AppendLine($"Measures: {beats.Length / 9600}");
-            sb.AppendLine($"Total Beats: {beats.Length}");
+            sb.AppendLine($"Measures: {_beats.Length / 9600}");
+            sb.AppendLine($"Total Beats: {_beats.Length}");
         
-            foreach (var beat in beats)
+            foreach (var beat in _beats)
             {
                 sb.AppendLine(beat.ToString());
             }
@@ -46,44 +46,14 @@ namespace GameCore
     /// </summary>
     public class Beat
     {
-        public readonly int BmsTick;
-        public readonly Note[] Notes;
-
-        public Beat(int bmsTick, Note[] notes)
-        {
-            BmsTick = bmsTick;
-            Notes = notes;
-        }
+        public readonly int Tick;
         
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine($"BmsTick: {BmsTick}");
-            sb.AppendLine($"Notes: {Notes?.Length ?? 0}");
-
-            if (Notes != null)
-            {
-                foreach (var note in Notes)
-                {
-                    sb.AppendLine(note.ToString());
-                }
-            }
-            
-            return sb.ToString();
-        }
-    }
-
-    /// <summary>
-    /// ノートデータを表現するクラス
-    /// 楽曲内のノートの種類と位置情報（レーン）を管理する
-    /// </summary>
-    public class Note
-    {
         public readonly NoteType Type;
         public readonly NoteLane Lane;
         
-        public Note(NoteType type, NoteLane lane)
+        public Beat(int tick, NoteType type, NoteLane lane)
         {
+            Tick = tick;
             Type = type;
             Lane = lane;
         }
@@ -91,6 +61,7 @@ namespace GameCore
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.AppendLine($"BmsTick: {Tick}");
             sb.AppendLine($"Type: {Type}");
             sb.AppendLine($"Lane: {Lane}");
             return sb.ToString();
