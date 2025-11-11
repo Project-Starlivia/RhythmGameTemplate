@@ -23,8 +23,8 @@ namespace BmsCore
     public static class BmsLoader
     {
         private static readonly Regex TitlePattern = new Regex(@"^#TITLE\s+(.+)$", RegexOptions.Compiled);
-        private static readonly Regex BpmPattern = new Regex(@"^#BPM([0-9A-Z]{2})\s+(\d+)$", RegexOptions.Compiled);
-        private static readonly Regex OffsetPattern = new Regex(@"^#OFFSET\s+([\d.]+)$", RegexOptions.Compiled);
+        private static readonly Regex BpmPattern = new Regex(@"^#BPM\s+(\d+)$", RegexOptions.Compiled);
+        private static readonly Regex OffsetPattern = new Regex(@"^#OFFSET\s+(-?[\d.]+)$", RegexOptions.Compiled);
         
         private static readonly Regex MainDataPattern = new Regex(@"^#(\d{3})(\d{2}):(.+)$", RegexOptions.Compiled);
         private static readonly Regex SplitTwoPattern = new Regex(@"(.{2})", RegexOptions.Compiled);

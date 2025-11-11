@@ -9,6 +9,19 @@ namespace BmsCore
     /// </summary>
     public static class BmsToPlayConverter
     {
+        private static readonly Dictionary<BmsChannelType, NoteLane> LaneMapping =
+            new Dictionary<BmsChannelType, NoteLane>
+            {
+                { BmsChannelType.LaneOne, NoteLane.One },
+                { BmsChannelType.LaneTwo, NoteLane.Two },
+                { BmsChannelType.LaneThree, NoteLane.Three },
+                { BmsChannelType.LaneFour, NoteLane.Four },
+                { BmsChannelType.LaneFive, NoteLane.Five },
+                { BmsChannelType.LaneSix, NoteLane.Six }
+            };
+
+
+        
         /// <summary>
         /// BMS譜面データをPlay用スコアデータに変換するメソッド
         /// </summary>
@@ -31,8 +44,13 @@ namespace BmsCore
                     continue;
 
                 // 小節内の各チャンネル(レーン)を処理
+                // 小節内の各チャンネル(レーン)を処理
                 foreach (var (channelType, values) in measureChannels)
                 {
+                    // チャンネルがマッピングに含まれない場合はスキップ
+                    if (!LaneMapping.ContainsKey(channelType))
+                        continue;
+
                     // チャンネル内のパラメータごとにデータを処理
                     for (var i = 0; i < values.Length; i++)
                     {
@@ -44,7 +62,7 @@ namespace BmsCore
 
                         // データからビート情報を生成
                         var noteType = (NoteType)(int)values[i];
-                        var laneType =  (NoteLane)channelType;
+                        var laneType =  LaneMapping[channelType];
                         var beat = new Beat(tick, noteType,laneType);
 					
                         // 作成したBeatを追加

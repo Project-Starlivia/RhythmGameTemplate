@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using BmsCore;
-using GameCore;
+using LibUnity;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace GameUnity
 {
@@ -26,41 +23,47 @@ namespace GameUnity
 
         private void Start()
         {
-            var lines = LoadBmsFile(bmsFile);
+            var lines = TextAssetLoader.Load(bmsFile);
             var bmsScore = BmsLoader.Load(lines);
             var runtimeScore = BmsToPlayConverter.Convert(bmsScore);
+            Debug.Log(bmsScore);
+            Debug.Log(runtimeScore);
 
             _runtimeTicker = new RuntimeTicker(runtimeScore);
             _basicNoteManger = new BasicNoteManger(notePrefab, settings, laneInputs, runtimeScore);
+
+            foreach (var input in laneInputs)
+            {
+                input.input.action.Enable();
+            }
             
-            audioSource.PlayScheduled(AudioSettings.dspTime + settings.playOffset);
-            _runtimeTicker.Play(settings.playOffset);
         }
 
+        private bool _musicStarted = false;
+        
         private void Update()
         {
+            if (!_musicStarted && 0 < Time.timeAsDouble)
+            {
+                audioSource.PlayScheduled(AudioSettings.dspTime + settings.playOffset);
+                _runtimeTicker.Play(settings.playOffset);
+                _musicStarted = true;
+            }
+            
             _runtimeTicker.Tick();
             _basicNoteManger.Update(_runtimeTicker.PreviousTick, _runtimeTicker.CurrentTick);
         }
-
-        /// <summary>
-        /// 指定されたTextAssetからBMSファイルを読み込んで、行ごとに分割した文字列のリストとして返します。
-        /// </summary>
-        /// <param name="file">読み込むBMSファイルが格納されたTextAssetオブジェクト。</param>
-        /// <returns>BMSデータを行ごとに分割した文字列のリスト。</returns>
-        private List<string> LoadBmsFile(TextAsset file)
+        
+        private void OnDestroy()
         {
-            List<string> lines = new();
-            using StringReader reader = new(file.text);
-            while (reader.ReadLine() is { } line)
+            foreach (var input in laneInputs)
             {
-                lines.Add(line);
+                input.input.action.Disable();
             }
-
-            return lines;
         }
     }
-
+    
+    
     /// <summary>
     /// RhythmGameSettingsクラスはリズムゲームの設定を管理するためのクラスです。
     /// プレイオフセット、ノートの位置比率、ノートが表示・非表示になるタイミング、
@@ -72,7 +75,7 @@ namespace GameUnity
     {
         public float playOffset = 3;
         public double notePosRatio = 5;
-        public double appearMeasureOffset = 2;
+        public double appearMeasureOffset = -2;
         public double disappearMeasureOffset = 1;
         public float hitRangeMs = 75;
     }

@@ -13,6 +13,7 @@ namespace GameUnity
         private readonly RuntimeScore _runtimeScore;
         
         private double _startTime;
+        private double _startTick;
         private double _currentTick;
         private double _previousTick;
 
@@ -39,7 +40,8 @@ namespace GameUnity
         public void Play(float offset)
         {
             var offsetTick = -TickCalculator.TimeToTick(_runtimeScore.BeatsOffset + offset, _runtimeScore.Bpm);
-            _startTime = offsetTick;
+            _startTime = Time.timeAsDouble;
+            _startTick = offsetTick;
             _currentTick = offsetTick;
             _previousTick = offsetTick;
             _isPlaying = true;
@@ -60,8 +62,8 @@ namespace GameUnity
                 TickCalculator.TimeToTick(elapsedTime, _runtimeScore.Bpm);
             
             _previousTick = _currentTick;
-            
-            _currentTick = _startTime + elapsedTick;
+
+            _currentTick = _startTick + elapsedTick;
         }
     }
 }

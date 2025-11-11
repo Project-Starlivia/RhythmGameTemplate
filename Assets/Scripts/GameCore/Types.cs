@@ -11,7 +11,7 @@
 
     public enum NoteLane
     {
-        One,
+        One = 0,
         Two,
         Three,
         Four,

@@ -28,6 +28,7 @@ namespace GameUnity
             _prefab = prefab;
             _settings = settings;
             _laneInputs = laneInputs;
+            _bpm = score.Bpm;
             _beats = score.Beats;
         }
 
@@ -54,28 +55,13 @@ namespace GameUnity
             var hitBeats = BeatCalculator
                 .FindHitBeats(_beats, currentTick, _settings.hitRangeMs, _bpm)
                 .Where(beat => inputLanes.Contains(beat.Lane));
-           
             // ヒットしたノートを削除
-            foreach (var beat in hitBeats)
-            {
-                if (!_noteInstances.TryGetValue(beat, out var instance)) continue;
-                
-                // ノートオブジェクトを破棄して管理リストから削除
-                Object.Destroy(instance);
-                _noteInstances.Remove(beat);
-            }
+            DestroyBeatsInstance(hitBeats);
             
             // ===== ノートの消失処理 =====
             // 判定ラインを通り過ぎて消失タイミングを迎えたノートを検索
             var disappearBeats = BeatCalculator.FindOffsetBeats(_noteInstances.Keys.ToArray(), previousTick, currentTick, _settings.disappearMeasureOffset * TickCalculator.TicksPerMeasure);
-            foreach (var beat in disappearBeats)
-            {
-                if (!_noteInstances.TryGetValue(beat, out var instance)) continue;
-                
-                // ノートオブジェクトを破棄して管理リストから削除
-                Object.Destroy(instance);
-                _noteInstances.Remove(beat);
-            }
+            DestroyBeatsInstance(disappearBeats);
 
             // ===== ノート位置の更新 =====
             // 現在存在する全てのノートの位置を更新
@@ -89,6 +75,18 @@ namespace GameUnity
                 var x = (int)beat.Lane;
                 // 計算された位置を適用
                 instance.transform.position = new Vector2(x, (float)y);
+            }
+        }
+
+        private void DestroyBeatsInstance(IEnumerable<Beat> beats)
+        {
+            foreach (var beat in beats)
+            {
+                if (!_noteInstances.TryGetValue(beat, out var instance)) continue;
+                
+                // ノートオブジェクトを破棄して管理リストから削除
+                Object.Destroy(instance.gameObject);
+                _noteInstances.Remove(beat);
             }
         }
     }

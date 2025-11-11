@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace GameCore
 {
-    public class BeatCalculator
+    public static class BeatCalculator
     {
         /// <summary>
         /// 指定された範囲内の拍（Beat）を取得します。
@@ -44,7 +44,7 @@ namespace GameCore
         /// <returns>ヒット可能な拍の列挙</returns>
         public static IEnumerable<Beat> FindHitBeats(Beat[] beats, double currentTick, double rangeMs, int bpm)
         {
-            var rangeTick = TickCalculator.TimeToTick(rangeMs / 1000, bpm);
+            var rangeTick = TickCalculator.TimeToTick(rangeMs / (double)1000, bpm);
 
             return FindRangeBeats(beats, currentTick - rangeTick, currentTick + rangeTick);
         }

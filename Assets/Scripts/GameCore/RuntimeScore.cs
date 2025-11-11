@@ -26,6 +26,7 @@ namespace GameCore
         {
             var sb = new StringBuilder();
             sb.AppendLine($"Title: {Title}");
+            sb.AppendLine($"BPM: {Bpm}");
             sb.AppendLine($"BeatsOffset: {BeatsOffset}");
             sb.AppendLine($"Measures: {_beats.Length / 9600}");
             sb.AppendLine($"Total Beats: {_beats.Length}");
@@ -46,12 +47,12 @@ namespace GameCore
     /// </summary>
     public class Beat
     {
-        public readonly int Tick;
+        public readonly double Tick;
         
         public readonly NoteType Type;
         public readonly NoteLane Lane;
         
-        public Beat(int tick, NoteType type, NoteLane lane)
+        public Beat(double tick, NoteType type, NoteLane lane)
         {
             Tick = tick;
             Type = type;

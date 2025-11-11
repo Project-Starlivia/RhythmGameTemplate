@@ -18,9 +18,9 @@ namespace GameCore
         /// <param name="beatIndex">小節内の拍のインデックス（0から始まる）。</param>
         /// <param name="beatCountInMeasure">1小節内の総拍数。</param>
         /// <returns>計算されたティック値。</returns>
-        public static int CalculateCurrentTick(int measureIndex, int beatIndex, int beatCountInMeasure)
+        public static double CalculateCurrentTick(int measureIndex, double beatIndex, double beatCountInMeasure)
         {
-            return (measureIndex + 1 / beatCountInMeasure * beatIndex) * TicksPerMeasure;
+            return (measureIndex + 1f / beatCountInMeasure * beatIndex) * TicksPerMeasure;
         }
 
         /// TicksPerBeat は 1 拍（beat）あたりの時間単位（tick）数を定義します。
